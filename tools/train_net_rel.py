@@ -93,13 +93,24 @@ if __name__ == '__main__':
     logger.info('Training with config:')
     logger.info(pprint.pformat(cfg))
 
-    train_model, output_dir, checkpoint_dir = \
+    train_model, output_dir, checkpoint_dir= \
         model_builder_rel.create(cfg.MODEL.MODEL_NAME, train=True)
     logger.info('Training model built.')
+    start_model_iter =0
+    params_ckp_file= checkpoints_rel.get_checkpoint_resume_file(checkpoint_dir)
+    if(cfg.CHECKPOINT.CHECKPOINT_MODEL and params_ckp_file is not None):
+        import pdb
+        pdb.set_trace()
+        params_ckp_file= checkpoints_rel.get_checkpoint_resume_file(checkpoint_dir)
+        start_model_iter = int(os.path.basename(params_ckp_file).replace('.pkl', '').replace('c2_model_iter', ''))
+        checkpoints_rel.initialize_params_from_file(
+                        model=train_model, weights_file=params_ckp_file,
+                        num_devices=cfg.NUM_DEVICES,
+                    )
 
     # do validation by default
     if True:
-        val_model, _, _ = \
+        val_model, _, _= \
             model_builder_rel.create(cfg.MODEL.MODEL_NAME, train=False, split='val')
         logger.info('Validation model built.')
         total_val_iters = int(math.ceil(
@@ -120,7 +131,6 @@ if __name__ == '__main__':
             if key.find('acc') >= 0:
                 wins[key] = None
 
-    start_model_iter = 0
     prev_checkpointed_lr = None
 
     lr_iters = model_builder_rel.get_lr_steps()
@@ -174,6 +184,7 @@ if __name__ == '__main__':
                 model=train_model, params_file=params_file,
                 model_iter=curr_iter, checkpoint_dir=checkpoint_dir
             )
+            #nu.save_model_to_weights_file(params_file, train_model)
             params_file = os.path.join(checkpoint_dir, 'latest.pkl')
             checkpoints_rel.save_model_params(
                 model=train_model, params_file=params_file,

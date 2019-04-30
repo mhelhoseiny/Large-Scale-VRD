@@ -93,6 +93,8 @@ __C.TRAIN.WEIGHTS = b''
 __C.TRAIN.IMS_PER_BATCH = 1
 # Minibatch size (number of regions of interest [ROIs])
 __C.TRAIN.BATCH_SIZE_PER_IM = 128
+# HUBNESS Loss
+__C.TRAIN.HUBNESS = False
 # Fraction of minibatch that is labeled foreground (i.e. class > 0)
 __C.TRAIN.FG_FRACTION = 0.25
 # Overlap threshold for a ROI to be considered foreground (if >= FG_THRESH)
@@ -426,6 +428,8 @@ __C.DATA.CIFAR10.DATA_STD = [63.0, 62.1, 66.7]
 
 
 def merge_dicts(dict_a, dict_b):
+    #import pdb
+    #pdb.set_trace()
     from ast import literal_eval
     for key, value in dict_a.items():
         if key not in dict_b:
